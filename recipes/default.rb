@@ -18,8 +18,15 @@
 # limitations under the License.
 #
 
-if Chef::Config[:solo]
-  return Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+def chef_solo_search_installed?
+  klass = ::Search::const_get('Helper')
+  return klass.is_a?(Class)
+rescue NameError
+  return false
+end
+
+if Chef::Config[:solo] and not chef_solo_search_installed?
+  return Chef::Log.warn("This recipe uses search. Chef Solo does not support search unless you install the chef-solo-search cookbook.")
 end
 
 # GRP deploy
